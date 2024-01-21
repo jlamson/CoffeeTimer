@@ -15,9 +15,9 @@ kotlin {
     iosX64()
     iosArm64()
     iosSimulatorArm64()
-    jvm {
-        jvmToolchain(17)
-    }
+//    jvm {
+//        jvmToolchain(17)
+//    }
 
     cocoapods {
         summary = "Some description for the Shared Module"

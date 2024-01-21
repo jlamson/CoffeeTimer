@@ -17,4 +17,4 @@ dependencyResolutionManagement {
 rootProject.name = "CoffeeTimer"
 include(":androidApp")
 include(":shared")
-include(":backend")
+//include(":backend")
