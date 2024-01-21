@@ -1,4 +1,4 @@
-package com.darkmoose117.coffeetimer
+package com.darkmoose117.coffee
 
 class Greeting {
     private val platform: Platform = getPlatform()

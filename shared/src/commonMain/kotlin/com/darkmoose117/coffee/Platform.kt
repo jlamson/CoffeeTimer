@@ -1,4 +1,4 @@
-package com.darkmoose117.coffeetimer
+package com.darkmoose117.coffee
 
 interface Platform {
     val name: String

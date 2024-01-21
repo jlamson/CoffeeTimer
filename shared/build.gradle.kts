@@ -39,7 +39,7 @@ kotlin {
 }
 
 android {
-    namespace = "com.darkmoose117.coffeetimer"
+    namespace = "com.darkmoose117.coffee"
     compileSdk = 34
     defaultConfig {
         minSdk = 28

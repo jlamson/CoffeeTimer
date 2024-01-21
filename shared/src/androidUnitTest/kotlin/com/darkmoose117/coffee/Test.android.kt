@@ -1,4 +1,4 @@
-package com.darkmoose117.coffeetimer
+package com.darkmoose117.coffee
 
 import org.junit.Assert.assertTrue
 import org.junit.Test

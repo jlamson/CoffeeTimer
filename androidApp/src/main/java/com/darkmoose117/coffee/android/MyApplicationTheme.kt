@@ -1,4 +1,4 @@
-package com.darkmoose117.coffeetimer.android
+package com.darkmoose117.coffee.android
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.shape.RoundedCornerShape
