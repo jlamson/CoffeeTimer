@@ -19,10 +19,6 @@ class GetRecipeListUseCase(
     private val log = logging()
 
     override operator fun invoke(): Flow<List<RecipeItem>> = recipeRepository.getRecipes()
-        .onStart { log.d { "GetRecipeListUseCase: onStart" } }
-        .logOnEach(log) { recipes ->
-            "GetRecipeListUseCase: pre-map ${recipes.joinToString(", ") { it.name }}"
-        }
         .map { recipes ->
             recipes.map {
                 RecipeItem(
@@ -35,10 +31,6 @@ class GetRecipeListUseCase(
                     }
                 )
             }
-        }.logOnEach(log) {
-            "GetRecipeListUseCase: post-map ${it.joinToString(", ")}"
-        }.onCompletion {
-            log.d { "GetRecipeListUseCase: onCompletion" }
         }
 }
 

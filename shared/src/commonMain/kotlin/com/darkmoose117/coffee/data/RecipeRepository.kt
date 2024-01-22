@@ -13,8 +13,6 @@ interface RecipeRepository {
 
 class FakeRecipeRepository : RecipeRepository {
 
-    private val log = logging()
-
     private val recipeMap = listOf(
         PourOver.Small,
         PourOver.Medium
@@ -22,9 +20,9 @@ class FakeRecipeRepository : RecipeRepository {
 
     override fun getRecipes() = flow {
         emit(recipeMap.values.toList())
-    }.logOnEach(log) { "Recipes: $it" }
+    }
 
     override fun getRecipe(id: String) = flow {
         emit(recipeMap[id])
-    }.logOnEach(log) { "Recipe[$id]: $it" }
+    }
 }

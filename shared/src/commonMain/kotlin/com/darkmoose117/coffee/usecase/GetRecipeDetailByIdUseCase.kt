@@ -13,9 +13,5 @@ interface IGetRecipeDetailIdUseCase {
 class GetRecipeDetailByIdUseCase(
     private val recipeRepository: RecipeRepository
 ): IGetRecipeDetailIdUseCase {
-
-    private val log = logging()
-
     override operator fun invoke(id: String): Flow<Recipe?> = recipeRepository.getRecipe(id)
-        .logOnEach(log) { "GetRecipeDetailByIdUseCase: $it" }
 }

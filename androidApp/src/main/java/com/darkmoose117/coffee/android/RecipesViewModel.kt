@@ -35,18 +35,12 @@ class RecipesViewModel(
         log.d { "Fetching recipes" }
         getRecipeListUseCase()
             .flowOn(dispatcher)
-            .onStart {
-                log.d { "ViewModel.fetchRecipes() - onStart" }
-                _recipeList.value = RecipeListState.Loading }
-            .onEach { recipeItems ->
-                log.d { "ViewModel.fetchRecipes() - onEach: ${recipeItems.joinToString { it.displayName }}" }
-                _recipeList.value = RecipeListState.Loaded(recipeItems) }
+            .onStart { _recipeList.value = RecipeListState.Loading }
+            .onEach { recipeItems -> _recipeList.value = RecipeListState.Loaded(recipeItems) }
             .onCompletion { cause ->
-                log.d { "ViewModel.fetchRecipes() - onCompletion: $cause" }
-                if (cause != null) {
-                    log.e(cause) { "Error fetching recipes" }
-                    _recipeList.value = RecipeListState.Error(cause)
-                }
+                val error = cause ?: IllegalStateException("Unknown error fetching recipes")
+                log.e(error) { "Error fetching recipes" }
+                _recipeList.value = RecipeListState.Error(error)
             }
             .launchIn(viewModelScope)
     }
@@ -65,10 +59,9 @@ class RecipesViewModel(
                 }
             }
             .onCompletion { cause ->
-                if (cause != null) {
-                    log.e(cause) { "Error fetching recipe detail for id: $id" }
-                    _selectedRecipe.value = RecipeDetailState.Error(cause)
-                }
+                val error = cause ?: IllegalStateException("Unknown error recipe [id=$id]")
+                log.e(error) { "Error fetching recipe [id=$id]" }
+                _recipeList.value = RecipeListState.Error(error)
             }
             .launchIn(viewModelScope)
     }

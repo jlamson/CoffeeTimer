@@ -32,9 +32,6 @@ import com.darkmoose117.coffee.navigation.Nav
 import com.darkmoose117.coffee.usecase.GetRecipeDetailByIdUseCase
 import com.darkmoose117.coffee.usecase.GetRecipeListUseCase
 import com.darkmoose117.coffee.usecase.RecipeItem
-import org.lighthousegames.logging.logging
-
-val log = logging()
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
