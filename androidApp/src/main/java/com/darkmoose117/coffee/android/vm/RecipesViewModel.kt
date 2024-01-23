@@ -1,4 +1,4 @@
-package com.darkmoose117.coffee.android
+package com.darkmoose117.coffee.android.vm
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -20,9 +20,8 @@ import org.lighthousegames.logging.logging
 class RecipesViewModel(
     private val getRecipeListUseCase: IGetRecipeListUseCase,
     private val getRecipeDetailByIdUseCase: IGetRecipeDetailIdUseCase,
-    private val dispatcher: CoroutineDispatcher = Dispatchers.Default
-): ViewModel() {
-
+    private val dispatcher: CoroutineDispatcher = Dispatchers.Default,
+) : ViewModel() {
     private val log = logging()
 
     private val _recipeList = MutableStateFlow<RecipeListState>(RecipeListState.Loading)
@@ -38,9 +37,10 @@ class RecipesViewModel(
             .onStart { _recipeList.value = RecipeListState.Loading }
             .onEach { recipeItems -> _recipeList.value = RecipeListState.Loaded(recipeItems) }
             .onCompletion { cause ->
-                val error = cause ?: IllegalStateException("Unknown error fetching recipes")
-                log.e(error) { "Error fetching recipes" }
-                _recipeList.value = RecipeListState.Error(error)
+                cause?.let {
+                    log.e(it) { "Error fetching recipes" }
+                    _recipeList.value = RecipeListState.Error(it)
+                }
             }
             .launchIn(viewModelScope)
     }
@@ -51,9 +51,10 @@ class RecipesViewModel(
             .onStart { _selectedRecipe.value = RecipeDetailState.Loading }
             .onEach { recipe ->
                 if (recipe == null) {
-                    _selectedRecipe.value = RecipeDetailState.Error(
-                        IllegalStateException("No recipe found for id: $id")
-                    )
+                    _selectedRecipe.value =
+                        RecipeDetailState.Error(
+                            IllegalStateException("No recipe found for id: $id"),
+                        )
                 } else {
                     _selectedRecipe.value = RecipeDetailState.Loaded(recipe)
                 }
@@ -68,13 +69,17 @@ class RecipesViewModel(
 }
 
 sealed class RecipeListState {
-    data object Loading: RecipeListState()
-    data class Loaded(val recipes: List<RecipeItem>): RecipeListState()
-    data class Error(val error: Throwable): RecipeListState()
+    data object Loading : RecipeListState()
+
+    data class Loaded(val recipes: List<RecipeItem>) : RecipeListState()
+
+    data class Error(val error: Throwable) : RecipeListState()
 }
 
 sealed class RecipeDetailState {
-    data object Loading: RecipeDetailState()
-    data class Loaded(val recipe: Recipe): RecipeDetailState()
-    data class Error(val error: Throwable): RecipeDetailState()
+    data object Loading : RecipeDetailState()
+
+    data class Loaded(val recipe: Recipe) : RecipeDetailState()
+
+    data class Error(val error: Throwable) : RecipeDetailState()
 }
