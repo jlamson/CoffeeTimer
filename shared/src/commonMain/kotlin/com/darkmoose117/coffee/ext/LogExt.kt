@@ -7,9 +7,10 @@ import org.lighthousegames.logging.logging
 
 fun <T> Flow<T>.logOnEach(
     log: KmLog = logging(),
-    message: ((T) -> Any?)? = null
-): Flow<T> = this.onEach {
-    log.debug {
-        message?.invoke(it) ?: "$it"
+    message: ((T) -> Any?)? = null,
+): Flow<T> =
+    this.onEach {
+        log.debug {
+            message?.invoke(it) ?: "$it"
+        }
     }
-}

@@ -21,7 +21,6 @@ import com.darkmoose117.coffee.data.PourOver
 import com.darkmoose117.coffee.data.Recipe
 import com.darkmoose117.coffeetimer.android.R
 
-
 @Composable
 fun RecipeDetailScreen(
     id: String,
@@ -36,16 +35,18 @@ fun RecipeDetailScreen(
 @Composable
 fun RecipeDetailScreen(
     state: RecipeDetailState,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     when (state) {
-        RecipeDetailState.Loading -> Box(modifier) {
-            Text(text = "Loading...")
-        }
-        is RecipeDetailState.Error -> Box(modifier) {
-            val error = state.error
-            Text(text = "Error: $error")
-        }
+        RecipeDetailState.Loading ->
+            Box(modifier) {
+                Text(text = "Loading...")
+            }
+        is RecipeDetailState.Error ->
+            Box(modifier) {
+                val error = state.error
+                Text(text = "Error: $error")
+            }
         is RecipeDetailState.Loaded -> {
             val recipe = state.recipe
             RecipeDetailOverview(recipe, modifier)
@@ -56,7 +57,7 @@ fun RecipeDetailScreen(
 @Composable
 fun RecipeDetailOverview(
     recipe: Recipe,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) = LazyColumn(modifier) {
     item {
         Text(
@@ -69,14 +70,15 @@ fun RecipeDetailOverview(
             SectionText(text = stringResource(R.string.ingredients))
         }
         items(recipe.ingredients) { ingredient ->
-            val ingredientText = buildString {
-                append(ingredient.type.name)
-                append(" - ")
-                append(ingredient.amount)
-                ingredient.unit.takeUnless { it.isNullOrBlank() }?.let {
-                    append(it)
+            val ingredientText =
+                buildString {
+                    append(ingredient.type.name)
+                    append(" - ")
+                    append(ingredient.amount)
+                    ingredient.unit.takeUnless { it.isNullOrBlank() }?.let {
+                        append(it)
+                    }
                 }
-            }
             Text(text = ingredientText)
         }
     }
@@ -85,19 +87,20 @@ fun RecipeDetailOverview(
             SectionText(text = stringResource(R.string.steps))
         }
         items(recipe.steps) { step ->
-            val stepText = buildString {
-                step.time.takeUnless { it <= 0 }?.let {
-                    append("\u2022 ").append(step.time).append("s: ")
-                }
-                append(step.name)
-                step.amount?.let { amount ->
-                    append(" [").append(amount)
-                    step.unit.takeUnless { it.isNullOrBlank() }?.let {
-                        append(" ").append(it)
+            val stepText =
+                buildString {
+                    step.time.takeUnless { it <= 0 }?.let {
+                        append("\u2022 ").append(step.time).append("s: ")
                     }
-                    append("]")
+                    append(step.name)
+                    step.amount?.let { amount ->
+                        append(" [").append(amount)
+                        step.unit.takeUnless { it.isNullOrBlank() }?.let {
+                            append(" ").append(it)
+                        }
+                        append("]")
+                    }
                 }
-            }
             Text(text = stepText)
         }
     }
@@ -115,9 +118,10 @@ private fun SectionText(
 
 @Preview
 @Composable
-fun RecipeDetailPreview() = ThemedPreview {
-    RecipeDetailScreen(
-        modifier = Modifier.padding(16.dp).fillMaxSize(),
-        state = RecipeDetailState.Loaded(PourOver.Small)
-    )
-}
+private fun RecipeDetailPreview() =
+    ThemedPreview {
+        RecipeDetailScreen(
+            modifier = Modifier.padding(16.dp).fillMaxSize(),
+            state = RecipeDetailState.Loaded(PourOver.Small),
+        )
+    }

@@ -1,7 +1,11 @@
+import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
+
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.kotlinCocoapods)
     alias(libs.plugins.androidLibrary)
+//    id("coffee.ktlint-conventions")
+    alias(libs.plugins.ktlint)
 }
 
 kotlin {
@@ -30,7 +34,7 @@ kotlin {
             isStatic = true
         }
     }
-    
+
     sourceSets {
         commonMain.dependencies {
             implementation(libs.kotlinx.coroutines.core)
@@ -48,5 +52,29 @@ android {
     compileSdk = 34
     defaultConfig {
         minSdk = 28
+    }
+}
+
+dependencies {
+    ktlintRuleset(libs.ktlint.ruleset.compose)
+}
+
+ktlint {
+    verbose.set(true)
+    outputToConsole.set(true)
+    android.set(true)
+    // add editorconfig row: "ktlint_function_naming_ignore_when_annotated_with=Composable"
+    additionalEditorconfig.set(
+        mapOf(
+            "ktlint_function_naming_ignore_when_annotated_with" to "Composable",
+        ),
+    )
+    filter {
+        exclude("**/generated/**")
+    }
+
+    reporters {
+        reporter(ReporterType.CHECKSTYLE)
+        reporter(ReporterType.JSON)
     }
 }

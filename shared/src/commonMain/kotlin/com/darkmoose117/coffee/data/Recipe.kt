@@ -5,7 +5,7 @@ data class Recipe(
     val name: String,
     val timeEstimate: Int?,
     val ingredients: List<Ingredient>,
-    val steps: List<RecipeStep>
+    val steps: List<RecipeStep>,
 ) {
     val formattedTime: String? by lazy {
         timeEstimate?.let { "${it / 60}:${it % 60}" }
@@ -15,11 +15,12 @@ data class Recipe(
 data class Ingredient(
     val type: IngredientType,
     val amount: Int,
-    val unit: String? = null
+    val unit: String? = null,
 )
 
 enum class IngredientType {
-    Water, Coffee
+    Water,
+    Coffee,
 }
 
 data class RecipeStep(
@@ -31,5 +32,7 @@ data class RecipeStep(
 )
 
 enum class ActionType {
-    Prep, Water, Wait
+    Prep,
+    Water,
+    Wait,
 }

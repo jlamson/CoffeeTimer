@@ -1,11 +1,8 @@
 package com.darkmoose117.coffee.usecase
 
 import com.darkmoose117.coffee.data.RecipeRepository
-import com.darkmoose117.coffee.ext.logOnEach
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onCompletion
-import kotlinx.coroutines.flow.onStart
 import org.lighthousegames.logging.logging
 
 interface IGetRecipeListUseCase {
@@ -13,28 +10,29 @@ interface IGetRecipeListUseCase {
 }
 
 class GetRecipeListUseCase(
-    private val recipeRepository: RecipeRepository
-): IGetRecipeListUseCase {
-
+    private val recipeRepository: RecipeRepository,
+) : IGetRecipeListUseCase {
     private val log = logging()
 
-    override operator fun invoke(): Flow<List<RecipeItem>> = recipeRepository.getRecipes()
-        .map { recipes ->
-            recipes.map {
-                RecipeItem(
-                    id = it.id,
-                    displayName = buildString {
-                        append(it.name)
-                        it.formattedTime?.let { time ->
-                            append(" - $time")
-                        }
-                    }
-                )
+    override operator fun invoke(): Flow<List<RecipeItem>> =
+        recipeRepository.getRecipes()
+            .map { recipes ->
+                recipes.map {
+                    RecipeItem(
+                        id = it.id,
+                        displayName =
+                            buildString {
+                                append(it.name)
+                                it.formattedTime?.let { time ->
+                                    append(" - $time")
+                                }
+                            },
+                    )
+                }
             }
-        }
 }
 
 data class RecipeItem(
     val id: String,
-    val displayName: String
+    val displayName: String,
 )

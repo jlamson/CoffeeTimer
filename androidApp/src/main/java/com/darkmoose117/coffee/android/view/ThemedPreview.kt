@@ -9,11 +9,15 @@ import androidx.compose.ui.Modifier
 import com.darkmoose117.coffee.android.MyApplicationTheme
 
 @Composable
-fun ThemedPreview(content: @Composable () -> Unit) = MyApplicationTheme {
+fun ThemedPreview(
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit,
+) = MyApplicationTheme {
     Box(
-        modifier = Modifier
-            .background(MaterialTheme.colorScheme.background)
-            .fillMaxSize()
+        modifier =
+            modifier
+                .background(MaterialTheme.colorScheme.background)
+                .fillMaxSize(),
     ) {
         content()
     }

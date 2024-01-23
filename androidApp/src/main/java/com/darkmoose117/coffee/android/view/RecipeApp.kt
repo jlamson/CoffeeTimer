@@ -13,16 +13,16 @@ import com.darkmoose117.coffee.usecase.GetRecipeDetailByIdUseCase
 import com.darkmoose117.coffee.usecase.GetRecipeListUseCase
 
 @Composable
-fun RecipeApp(
-    repository: RecipeRepository = FakeRecipeRepository(),
-    viewModel: RecipesViewModel = androidx.lifecycle.viewmodel.compose.viewModel {
-        RecipesViewModel(
-            getRecipeListUseCase = GetRecipeListUseCase(repository),
-            getRecipeDetailByIdUseCase = GetRecipeDetailByIdUseCase(repository),
-        )
-    },
-    navController: NavHostController = rememberNavController()
-) {
+fun RecipeApp() {
+    val repository: RecipeRepository = FakeRecipeRepository()
+    val viewModel: RecipesViewModel =
+        androidx.lifecycle.viewmodel.compose.viewModel {
+            RecipesViewModel(
+                getRecipeListUseCase = GetRecipeListUseCase(repository),
+                getRecipeDetailByIdUseCase = GetRecipeDetailByIdUseCase(repository),
+            )
+        }
+    val navController: NavHostController = rememberNavController()
     NavHost(
         navController = navController,
         startDestination = Nav.Dest.RecipeList.route,
