@@ -29,7 +29,9 @@ data class RecipeStep(
     val time: Int = -1,
     val amount: Int? = null,
     val unit: String? = null,
-)
+) {
+    val isTimed: Boolean = time > 0
+}
 
 enum class ActionType {
     Prep,
