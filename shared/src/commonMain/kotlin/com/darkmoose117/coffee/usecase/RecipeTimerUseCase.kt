@@ -47,8 +47,9 @@ class RecipeTimerUseCase(
         launch {
             mutex.withLock {
                 val state = _timerState.value as? ITimerState.Timer ?: return@launch
+                val skipDelay = state.isPaused && !state.step.isTimed
                 _timerState.value = state.copy(isPaused = false)
-                tick()
+                tick(skipDelay = skipDelay)
             }
         }
     }
@@ -63,12 +64,19 @@ class RecipeTimerUseCase(
         }
     }
 
-    private suspend fun tick() {
+    private fun tick(skipDelay: Boolean = false) {
         tickJob =
             launch {
-                delay(1_000)
-
                 val state = _timerState.value as? ITimerState.Timer ?: return@launch
+
+                val totalTime =
+                    if (!skipDelay) {
+                        delay(1.seconds)
+                        state.totalTime + 1.seconds
+                    } else {
+                        state.totalTime
+                    }
+
                 when {
                     // Timer is paused, do nothing
                     state.isPaused -> {
@@ -77,7 +85,7 @@ class RecipeTimerUseCase(
                         return@launch
                     }
                     // Either step is untimed or timed step is completed, move to next step
-                    state.timeLeftInStep <= Duration.ZERO -> {
+                    state.timeLeftInStep <= 1.seconds -> {
                         val nextStep = state.recipe.steps.getOrNull(state.stepIndex + 1)
                         if (nextStep == null) {
                             // If no next step, we're done!
@@ -87,18 +95,18 @@ class RecipeTimerUseCase(
                                 state.copy(
                                     stepIndex = state.stepIndex + 1,
                                     timeLeftInStep = nextStep.time.seconds,
-                                    totalTime = state.totalTime + 1.seconds,
+                                    totalTime = totalTime,
                                     isPaused = !nextStep.isTimed,
                                 )
                             tick()
                         }
                     }
                     // Timer is running, but step is not complete, decrement time left in step
-                    state.timeLeftInStep > Duration.ZERO -> {
+                    else -> {
                         _timerState.value =
                             state.copy(
                                 timeLeftInStep = state.timeLeftInStep - 1.seconds,
-                                totalTime = state.totalTime + 1.seconds,
+                                totalTime = totalTime,
                             )
                         tick()
                     }

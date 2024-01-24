@@ -14,6 +14,7 @@ class FakeRecipeRepository : RecipeRepository {
         listOf(
             PourOver.Small,
             PourOver.Medium,
+            TestRecipe.Water,
         ).associateBy { it.id }
 
     override fun getRecipes() =

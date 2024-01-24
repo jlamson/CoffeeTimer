@@ -69,7 +69,10 @@ fun RecipeList(
             items = recipes,
             key = { it.id },
         ) {
-            RecipeRow(text = it.displayName, onClick = { onRecipeClicked(it.id) })
+            RecipeRow(
+                text = it.displayName,
+                onClick = { onRecipeClicked(it.id) },
+            )
         }
         if (recipes.isEmpty()) {
             item {
@@ -89,7 +92,8 @@ fun RecipeRow(
         modifier
             .fillMaxWidth()
             .defaultMinSize(minHeight = 56.dp)
-            .apply { onClick?.let { clickable { it() } } },
+            .clickable { onClick?.invoke() }
+            .padding(horizontal = 16.dp, vertical = 8.dp),
     contentAlignment = Alignment.CenterStart,
 ) {
     Text(

@@ -81,7 +81,7 @@ fun CoffeeTimer(
 ) = Column(
     verticalArrangement = Arrangement.Top,
     horizontalAlignment = Alignment.Start,
-    modifier = modifier,
+    modifier = modifier.padding(16.dp),
 ) {
     Text(
         text = state.recipe.name,
@@ -101,7 +101,7 @@ fun CoffeeTimer(
         modifier =
             Modifier
                 .align(Alignment.CenterHorizontally)
-                .padding(bottom = 32.dp),
+                .padding(bottom = 16 .dp),
         text = state.step.displayText,
         style = MaterialTheme.typography.displaySmall,
     )
@@ -145,7 +145,6 @@ private fun CoffeeTimerPreview_Prep() =
                     totalTime = Duration.ZERO,
                     isPaused = true,
                 ),
-            modifier = Modifier.fillMaxSize().padding(16.dp),
         )
     }
 
@@ -162,6 +161,5 @@ private fun CoffeeTimerPreview_TimedStep() =
                     totalTime = 15.seconds,
                     isPaused = false,
                 ),
-            modifier = Modifier.fillMaxSize().padding(16.dp),
         )
     }

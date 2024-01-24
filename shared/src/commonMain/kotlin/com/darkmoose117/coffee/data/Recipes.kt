@@ -7,6 +7,42 @@ object Units {
     const val ML = "ml"
 }
 
+object TestRecipe {
+    val Water =
+        Recipe(
+            id = "TEST_WATER",
+            name = "Glass of water",
+            timeEstimate = 15,
+            ingredients = listOf(Ingredient(IngredientType.Water, 500, Units.ML)),
+            steps =
+                listOf(
+                    RecipeStep(
+                        type = ActionType.Prep,
+                        name = "Hydrate!",
+                    ),
+                    RecipeStep(
+                        type = ActionType.Water,
+                        name = "Pour some",
+                        time = 5,
+                        amount = 250,
+                        unit = Units.ML,
+                    ),
+                    RecipeStep(
+                        type = ActionType.Wait,
+                        name = "Wait",
+                        time = 5,
+                    ),
+                    RecipeStep(
+                        type = ActionType.Water,
+                        name = "Pour some more!",
+                        time = 5,
+                        amount = 250,
+                        unit = Units.ML,
+                    ),
+                ),
+        )
+}
+
 object PourOver {
     val Small = buildPourOverInFifths(15, 250)
     val Medium = buildPourOverInFifths(24, 400)

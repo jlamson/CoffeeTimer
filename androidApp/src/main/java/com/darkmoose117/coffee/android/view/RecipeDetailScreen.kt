@@ -1,10 +1,13 @@
 package com.darkmoose117.coffee.android.view
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,16 +29,18 @@ fun RecipeDetailScreen(
     id: String,
     viewModel: RecipesViewModel,
     modifier: Modifier = Modifier,
+    onStartTimer: () -> Unit,
 ) {
     LaunchedEffect(id) { viewModel.fetchRecipeDetail(id) }
     val state: RecipeDetailState by viewModel.selectedRecipe.collectAsState(RecipeDetailState.Loading)
-    RecipeDetailScreen(state, modifier)
+    RecipeDetailScreen(state, modifier, onStartTimer)
 }
 
 @Composable
 fun RecipeDetailScreen(
     state: RecipeDetailState,
     modifier: Modifier = Modifier,
+    onStartTimer: () -> Unit,
 ) {
     when (state) {
         RecipeDetailState.Loading ->
@@ -49,7 +54,7 @@ fun RecipeDetailScreen(
             }
         is RecipeDetailState.Loaded -> {
             val recipe = state.recipe
-            RecipeDetailOverview(recipe, modifier)
+            RecipeDetailOverview(recipe, modifier, onStartTimer)
         }
     }
 }
@@ -58,36 +63,42 @@ fun RecipeDetailScreen(
 fun RecipeDetailOverview(
     recipe: Recipe,
     modifier: Modifier = Modifier,
-) = LazyColumn(modifier) {
-    item {
-        Text(
-            text = recipe.name,
-            style = MaterialTheme.typography.headlineLarge,
-        )
-    }
-    val sectionModifier = Modifier.padding(top = 24.dp, bottom = 8.dp)
-    if (recipe.ingredients.isNotEmpty()) {
+    onStartTimer: () -> Unit,
+) = Column(modifier.padding(16.dp)) {
+    LazyColumn(Modifier.weight(1f).fillMaxWidth()) {
         item {
-            SectionText(stringResource(R.string.ingredients), sectionModifier)
+            Text(
+                text = recipe.name,
+                style = MaterialTheme.typography.headlineLarge,
+            )
         }
-        items(recipe.ingredients) { ingredient ->
-            Text(text = ingredient.displayText)
+        val sectionModifier = Modifier.padding(top = 24.dp, bottom = 8.dp)
+        if (recipe.ingredients.isNotEmpty()) {
+            item {
+                SectionText(stringResource(R.string.ingredients), sectionModifier)
+            }
+            items(recipe.ingredients) { ingredient ->
+                Text(text = ingredient.displayText)
+            }
         }
-    }
-    if (recipe.steps.isNotEmpty()) {
-        item {
-            SectionText(stringResource(R.string.steps), sectionModifier)
-        }
-        items(recipe.steps) { step ->
-            val text =
-                buildString {
-                    step.time.takeUnless { it <= 0 }?.let {
-                        append("\u2022 ").append(step.time).append("s: ")
+        if (recipe.steps.isNotEmpty()) {
+            item {
+                SectionText(stringResource(R.string.steps), sectionModifier)
+            }
+            items(recipe.steps) { step ->
+                val text =
+                    buildString {
+                        step.time.takeUnless { it <= 0 }?.let {
+                            append("\u2022 ").append(step.time).append("s: ")
+                        }
+                        append(step.displayText)
                     }
-                    append(step.displayText)
-                }
-            Text(text)
+                Text(text)
+            }
         }
+    }
+    Button(modifier = Modifier.fillMaxWidth(), onClick = onStartTimer) {
+        Text(text = "Start Timer", style = MaterialTheme.typography.labelLarge)
     }
 }
 
@@ -106,7 +117,7 @@ private fun SectionText(
 private fun RecipeDetailPreview() =
     ThemedPreview {
         RecipeDetailScreen(
-            modifier = Modifier.padding(16.dp).fillMaxSize(),
             state = RecipeDetailState.Loaded(PourOver.Small),
+            onStartTimer = {},
         )
     }

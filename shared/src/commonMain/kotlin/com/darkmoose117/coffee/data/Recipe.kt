@@ -1,5 +1,7 @@
 package com.darkmoose117.coffee.data
 
+import kotlin.time.Duration.Companion.seconds
+
 data class Recipe(
     val id: String,
     val name: String,
@@ -8,7 +10,7 @@ data class Recipe(
     val steps: List<RecipeStep>,
 ) {
     val formattedTime: String? by lazy {
-        timeEstimate?.let { "${it / 60}:${it % 60}" }
+        timeEstimate?.seconds?.toString()
     }
 }
 

@@ -3,7 +3,7 @@ package com.darkmoose117.coffee.android.vm
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.darkmoose117.coffee.data.Recipe
-import com.darkmoose117.coffee.usecase.IGetRecipeDetailIdUseCase
+import com.darkmoose117.coffee.usecase.IGetRecipeDetailByIdUseCase
 import com.darkmoose117.coffee.usecase.IGetRecipeListUseCase
 import com.darkmoose117.coffee.usecase.RecipeItem
 import kotlinx.coroutines.CoroutineDispatcher
@@ -19,7 +19,7 @@ import org.lighthousegames.logging.logging
 
 class RecipesViewModel(
     private val getRecipeListUseCase: IGetRecipeListUseCase,
-    private val getRecipeDetailByIdUseCase: IGetRecipeDetailIdUseCase,
+    private val getRecipeDetailByIdUseCase: IGetRecipeDetailByIdUseCase,
     private val dispatcher: CoroutineDispatcher = Dispatchers.Default,
 ) : ViewModel() {
     private val log = logging()
