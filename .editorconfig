@@ -5,3 +5,6 @@ ktlint = disabled
 
 [*.{kt,kts}]
 ktlint_code_style = ktlint_official
+
+[**/android/**/*.{kt,kts}]
+ktlint_standard_function-naming = disabled

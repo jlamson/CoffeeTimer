@@ -5,22 +5,27 @@ import com.darkmoose117.coffee.data.RecipeStep
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
+
+interface IRecipeTimerUseCase {
+    val timerState: StateFlow<ITimerState>
+
+    fun resume()
+
+    fun pause()
+}
 
 class RecipeTimerUseCase(
     recipe: Recipe,
     dispatcher: CoroutineDispatcher,
-) {
-    private val job = SupervisorJob()
-    private val context = job + dispatcher
-    private val scope = CoroutineScope(context)
-
+) : IRecipeTimerUseCase, CoroutineScope by CoroutineScope(dispatcher) {
     private val mutex = Mutex()
 
     private var tickJob: Job? = null
@@ -28,31 +33,31 @@ class RecipeTimerUseCase(
     private val _timerState =
         MutableStateFlow<ITimerState>(
             // TODO [2024-01-23] currently assume nothing about first step. Inject prep step if not present?
-            ITimerState.TimerState(
+            ITimerState.Timer(
                 recipe = recipe,
                 stepIndex = 0,
-                timeLeftInStep = recipe.steps.first().time,
-                totalTime = 0,
+                timeLeftInStep = recipe.steps.first().time.seconds,
+                totalTime = Duration.ZERO,
                 isPaused = true,
             ),
         )
-    val timerState: StateFlow<ITimerState> get() = _timerState
+    override val timerState: StateFlow<ITimerState> get() = _timerState
 
-    fun resume() {
-        scope.launch {
+    override fun resume() {
+        launch {
             mutex.withLock {
-                val state = _timerState.value as? ITimerState.TimerState ?: return@launch
+                val state = _timerState.value as? ITimerState.Timer ?: return@launch
                 _timerState.value = state.copy(isPaused = false)
                 tick()
             }
         }
     }
 
-    fun pause() {
-        scope.launch {
+    override fun pause() {
+        launch {
             mutex.withLock {
                 tickJob?.cancel()
-                val state = _timerState.value as? ITimerState.TimerState ?: return@launch
+                val state = _timerState.value as? ITimerState.Timer ?: return@launch
                 _timerState.value = state.copy(isPaused = true)
             }
         }
@@ -60,10 +65,10 @@ class RecipeTimerUseCase(
 
     private suspend fun tick() {
         tickJob =
-            scope.launch {
+            launch {
                 delay(1_000)
 
-                val state = _timerState.value as? ITimerState.TimerState ?: return@launch
+                val state = _timerState.value as? ITimerState.Timer ?: return@launch
                 when {
                     // Timer is paused, do nothing
                     state.isPaused -> {
@@ -72,28 +77,28 @@ class RecipeTimerUseCase(
                         return@launch
                     }
                     // Either step is untimed or timed step is completed, move to next step
-                    state.timeLeftInStep <= 0 -> {
+                    state.timeLeftInStep <= Duration.ZERO -> {
                         val nextStep = state.recipe.steps.getOrNull(state.stepIndex + 1)
                         if (nextStep == null) {
                             // If no next step, we're done!
-                            _timerState.value = ITimerState.TimerComplete
+                            _timerState.value = ITimerState.Complete
                         } else {
                             _timerState.value =
                                 state.copy(
                                     stepIndex = state.stepIndex + 1,
-                                    timeLeftInStep = nextStep.time,
-                                    totalTime = state.totalTime + 1,
+                                    timeLeftInStep = nextStep.time.seconds,
+                                    totalTime = state.totalTime + 1.seconds,
                                     isPaused = !nextStep.isTimed,
                                 )
                             tick()
                         }
                     }
                     // Timer is running, but step is not complete, decrement time left in step
-                    state.timeLeftInStep > 0 -> {
+                    state.timeLeftInStep > Duration.ZERO -> {
                         _timerState.value =
                             state.copy(
-                                timeLeftInStep = state.timeLeftInStep - 1,
-                                totalTime = state.totalTime + 1,
+                                timeLeftInStep = state.timeLeftInStep - 1.seconds,
+                                totalTime = state.totalTime + 1.seconds,
                             )
                         tick()
                     }
@@ -103,15 +108,15 @@ class RecipeTimerUseCase(
 }
 
 sealed interface ITimerState {
-    data class TimerState(
+    data class Timer(
         val recipe: Recipe,
         val stepIndex: Int,
-        val timeLeftInStep: Int,
-        val totalTime: Int,
+        val timeLeftInStep: Duration,
+        val totalTime: Duration,
         val isPaused: Boolean,
     ) : ITimerState {
         val step: RecipeStep get() = recipe.steps[stepIndex]
     }
 
-    data object TimerComplete : ITimerState
+    data object Complete : ITimerState
 }

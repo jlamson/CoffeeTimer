@@ -16,7 +16,18 @@ data class Ingredient(
     val type: IngredientType,
     val amount: Int,
     val unit: String? = null,
-)
+) {
+    val displayText: String by lazy {
+        buildString {
+            append(type.name)
+            append(" - ")
+            append(amount)
+            unit.takeUnless { it.isNullOrBlank() }?.let {
+                append(it)
+            }
+        }
+    }
+}
 
 enum class IngredientType {
     Water,
@@ -31,6 +42,18 @@ data class RecipeStep(
     val unit: String? = null,
 ) {
     val isTimed: Boolean = time > 0
+    val displayText: String by lazy {
+        buildString {
+            append(name)
+            amount?.let { amount ->
+                append(" [").append(amount)
+                unit.takeUnless { it.isNullOrBlank() }?.let {
+                    append(" ").append(it)
+                }
+                append("]")
+            }
+        }
+    }
 }
 
 enum class ActionType {

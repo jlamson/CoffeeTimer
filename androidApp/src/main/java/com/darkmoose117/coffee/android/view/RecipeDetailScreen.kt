@@ -65,43 +65,28 @@ fun RecipeDetailOverview(
             style = MaterialTheme.typography.headlineLarge,
         )
     }
+    val sectionModifier = Modifier.padding(top = 24.dp, bottom = 8.dp)
     if (recipe.ingredients.isNotEmpty()) {
         item {
-            SectionText(text = stringResource(R.string.ingredients))
+            SectionText(stringResource(R.string.ingredients), sectionModifier)
         }
         items(recipe.ingredients) { ingredient ->
-            val ingredientText =
-                buildString {
-                    append(ingredient.type.name)
-                    append(" - ")
-                    append(ingredient.amount)
-                    ingredient.unit.takeUnless { it.isNullOrBlank() }?.let {
-                        append(it)
-                    }
-                }
-            Text(text = ingredientText)
+            Text(text = ingredient.displayText)
         }
     }
     if (recipe.steps.isNotEmpty()) {
         item {
-            SectionText(text = stringResource(R.string.steps))
+            SectionText(stringResource(R.string.steps), sectionModifier)
         }
         items(recipe.steps) { step ->
-            val stepText =
+            val text =
                 buildString {
                     step.time.takeUnless { it <= 0 }?.let {
                         append("\u2022 ").append(step.time).append("s: ")
                     }
-                    append(step.name)
-                    step.amount?.let { amount ->
-                        append(" [").append(amount)
-                        step.unit.takeUnless { it.isNullOrBlank() }?.let {
-                            append(" ").append(it)
-                        }
-                        append("]")
-                    }
+                    append(step.displayText)
                 }
-            Text(text = stepText)
+            Text(text)
         }
     }
 }
@@ -109,7 +94,7 @@ fun RecipeDetailOverview(
 @Composable
 private fun SectionText(
     text: String,
-    modifier: Modifier = Modifier.padding(top = 24.dp, bottom = 8.dp),
+    modifier: Modifier = Modifier,
 ) = Text(
     modifier = modifier,
     text = text,
